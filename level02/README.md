@@ -16,3 +16,17 @@ ffffe4000702a2a2a2a2a2a2a2affffe5f8f7ff9a087373617000000000000003437684861733951
 ```
 
 27 values before repeating 7257825 ('%x' repeating from printf arg)
+
+This is a printf vulnerability, similar to level4 of rainfall.
+
+```c
+if (strncmp(ptr, password, 41)) {
+    printf(username);
+    puts(" does not have access!");
+    exit(1);
+}
+printf("Greetings, %s!\n", username);
+system("/bin/sh");
+```
+
+We'll overwrite the address of the GOT exit with the address where `system("/bin/sh")` is called.

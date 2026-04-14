@@ -3,7 +3,7 @@
 After port-forwarding the guest port 4242 to 24242 on the host, and logging in with `ssh`, we are greeted by this screen:
 
 ```console
-ssh level00@localhost -p 24242
+$ ssh level00@localhost -p 24242
            ____                  ____  _     __   
           / __ \_   _____  _____/ __ \(_)___/ /__ 
          / / / / | / / _ \/ ___/ /_/ / / __  / _ \
