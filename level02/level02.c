@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(int argc, const char** argv, const char** envp) {
+int main() {
     char password[100];  // [rsp+10h] [rbp-110h] BYREF
     char ptr[48];  // [rsp+80h] [rbp-A0h] BYREF
     char username[100];  // [rsp+B0h] [rbp-70h] BYREF
