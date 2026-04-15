@@ -1,41 +1,40 @@
+#include <fcntl.h>
 #include <linux/prctl.h>
+#include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/prctl.h>
 #include <sys/ptrace.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/user.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 int main() {
-    int stat_loc;  // [esp+1Ch] [ebp-9Ch] BYREF
-    char s[128];  // [esp+20h] [ebp-98h] BYREF
-    int v6;  // [esp+A0h] [ebp-18h]
-    int v7;  // [esp+A4h] [ebp-14h]
-    int v8;  // [esp+A8h] [ebp-10h]
-    __pid_t v9;  // [esp+ACh] [ebp-Ch]
+    char buffer[128];
 
-    v9 = fork();
-    memset(s, 0, sizeof(s));
-    v8 = 0;
-    stat_loc = 0;
-    if (v9) {
+    __pid_t pid = fork();
+    memset(buffer, 0, sizeof(buffer));
+
+    if (pid == 0) {
+        prctl(PR_SET_PDEATHSIG, SIGHUP);
+        ptrace(PTRACE_TRACEME, 0, 0, 0);
+        puts("Give me some shellcode, k");
+        gets(buffer);
+    } else {
         do {
-            wait(&stat_loc);
-            v6 = stat_loc;
-            if ((stat_loc & 0x7F) == 0
-                || (v7 = stat_loc, (char)((stat_loc & 0x7F) + 1) >> 1 > 0)) {
+            int wstatus = 0;
+            wait(&wstatus);
+            if (WIFEXITED(wstatus) || WIFSIGNALED(wstatus)) {
                 puts("child is exiting...");
                 return 0;
             }
-            v8 = ptrace(PTRACE_PEEKUSER, v9, 44, 0);
-        } while (v8 != 11);
+        } while (ptrace(PTRACE_PEEKUSER, pid, 44, 0) != 11);
         puts("no exec() for you");
-        kill(v9, 9);
-    } else {
-        prctl(1, 1);
-        ptrace(PTRACE_TRACEME, 0, 0, 0);
-        puts("Give me some shellcode, k");
-        gets(s);
+        kill(pid, SIGKILL);
     }
+
     return 0;
 }
