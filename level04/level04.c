@@ -12,6 +12,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+// Constants valid for x86 only
+#define ORIG_EAX 44
+#define SYS_EXECVE 11
+
 int main() {
     char buffer[128];
 
@@ -31,7 +35,7 @@ int main() {
                 puts("child is exiting...");
                 return 0;
             }
-        } while (ptrace(PTRACE_PEEKUSER, pid, 44, 0) != 11);
+        } while (ptrace(PTRACE_PEEKUSER, pid, ORIG_EAX, 0) != SYS_EXECVE);
         puts("no exec() for you");
         kill(pid, SIGKILL);
     }
