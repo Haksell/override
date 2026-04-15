@@ -23,8 +23,8 @@ void decrypt(int key) {
     }
 }
 
-void test(int a1, int a2) {
-    int diff = a2 - a1;
+void test(int input, int given) {
+    int diff = given - input;
 
     // actually a long unoptimized switch case in assembly
     if (1 <= diff && diff <= 9 || 16 <= diff && diff <= 21) {
@@ -42,6 +42,6 @@ int main() {
     printf("Password:");
     int input;
     scanf("%d", &input);
-    test(input, 0x1337d00d);  // 322424845
+    test(input, 322424845);
     return 0;
 }

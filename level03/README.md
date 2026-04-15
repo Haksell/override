@@ -38,3 +38,36 @@
    0x080488e0 <+134>:   ret    
 End of assembler dump.
 ```
+
+Only 15 values to bruteforce, 322424827 is the only one thqt doesn't show "Invalid password", very strange uwu 
+
+```
+level03@OverRide:~$ echo '322424822' |  ./level03 
+***********************************
+*               level03         **
+***********************************
+Password:
+Invalid Password
+level03@OverRide:~$ echo '322424827' |  ./level03 
+***********************************
+*               level03         **
+***********************************
+Password:level03@OverRide:~$ ./level03 
+***********************************
+*               level03         **
+***********************************
+Password:322424827
+$ whoami
+level04
+$ cat /home/users/level04/.pass
+kgv3tkEb9h2mLkRsPkXRfc2mHbjMxQzvb2FrgKkf
+```
+
+```python
+>>> ord('C') ^ ord('Q')
+18
+>>> ord('o') ^ ord('}')
+18
+```
+
+The key must be 18 so we give 322424845 - 18 = 322424827 im a hacker of cyberspace
