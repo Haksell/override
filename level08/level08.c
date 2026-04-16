@@ -6,11 +6,11 @@
 #include <unistd.h>
 
 void log_wrapper(FILE* a1, const char* a2, const char* a3) {
-    char dest[264];
+    char dest[256];
 
     strcpy(dest, a2);
     snprintf(&dest[strlen(dest)], 254 - strlen(dest), a3);
-    dest[strcspn(dest, "\n")] = 0;
+    dest[strcspn(dest, "\n")] = '\0';
     fprintf(a1, "LOG: %s\n", dest);
 }
 
@@ -24,8 +24,8 @@ int main(int argc, const char** argv) {
     }
     log_wrapper(log_file, "Starting back up: ", argv[1]);
 
-    FILE* stream = fopen(argv[1], "r");
-    if (!stream) {
+    FILE* arg_file = fopen(argv[1], "r");
+    if (!arg_file) {
         printf("ERROR: Failed to open %s\n", argv[1]);
         exit(EXIT_FAILURE);
     }
@@ -42,13 +42,13 @@ int main(int argc, const char** argv) {
     }
 
     while (true) {
-        char buf = fgetc(stream);
+        char buf = fgetc(arg_file);
         if (buf == EOF) break;
         write(fd, &buf, 1);
     }
 
     log_wrapper(log_file, "Finished back up ", argv[1]);
-    fclose(stream);
+    fclose(arg_file);
     close(fd);
     return EXIT_SUCCESS;
 }
