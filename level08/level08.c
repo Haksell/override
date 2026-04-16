@@ -1,11 +1,12 @@
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 void log_wrapper(FILE* a1, const char* a2, const char* a3) {
-    char dest[264];  // [rsp+20h] [rbp-110h] BYREF
+    char dest[264];
 
     strcpy(dest, a2);
     snprintf(&dest[strlen(dest)], 254 - strlen(dest), a3);
@@ -13,41 +14,41 @@ void log_wrapper(FILE* a1, const char* a2, const char* a3) {
     fprintf(a1, "LOG: %s\n", dest);
 }
 
-int main(int argc, const char** argv, const char** envp) {
-    FILE* v4;  // [rsp+28h] [rbp-88h]
-    FILE* stream;  // [rsp+30h] [rbp-80h]
-    int fd;  // [rsp+38h] [rbp-78h]
-    char buf;  // [rsp+3Fh] [rbp-71h] BYREF
-    char dest[104];  // [rsp+40h] [rbp-70h] BYREF
-
-    buf = -1;
+int main(int argc, const char** argv) {
     if (argc != 2) printf("Usage: %s filename\n", *argv);
-    v4 = fopen("./backups/.log", "w");
-    if (!v4) {
+
+    FILE* log_file = fopen("./backups/.log", "w");
+    if (!log_file) {
         printf("ERROR: Failed to open %s\n", "./backups/.log");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
-    log_wrapper(v4, "Starting back up: ", argv[1]);
-    stream = fopen(argv[1], "r");
+    log_wrapper(log_file, "Starting back up: ", argv[1]);
+
+    FILE* stream = fopen(argv[1], "r");
     if (!stream) {
         printf("ERROR: Failed to open %s\n", argv[1]);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
+
+    char dest[100];
     strcpy(dest, "./backups/");
     strncat(dest, argv[1], 99 - strlen(dest));
-    // fd = open(dest, 193, 432);
-    fd = open(dest, O_WRONLY | O_CREAT | O_EXCL, 0660);
+
+    // int fd = open(dest, 193, 432);
+    int fd = open(dest, O_WRONLY | O_CREAT | O_EXCL, 0660);
     if (fd < 0) {
         printf("ERROR: Failed to open %s%s\n", "./backups/", argv[1]);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
-    while (1) {
-        buf = fgetc(stream);
-        if (buf == -1) break;
-        write(fd, &buf, 1u);
+
+    while (true) {
+        char buf = fgetc(stream);
+        if (buf == EOF) break;
+        write(fd, &buf, 1);
     }
-    log_wrapper(v4, "Finished back up ", argv[1]);
+
+    log_wrapper(log_file, "Finished back up ", argv[1]);
     fclose(stream);
     close(fd);
-    return 0;
+    return EXIT_SUCCESS;
 }
