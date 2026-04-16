@@ -1,1 +1,2 @@
 (echo -e 'set disassembly-flavor intel\nset pagination off\nb main\nrun\ndisas' ; cat) | gdb level0
+(echo -e 'set disassembly-flavor intel\nset pagination off\nset follow-fork-mode child' ; cat) | gdb level0
