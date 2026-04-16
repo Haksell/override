@@ -1,6 +1,12 @@
-level00-level03: clean readme
+level00: clean readme
+level01: clean readme
+level02: clean readme
+level03: clean readme
 level04: unfinished (shellcode without execve)
 level05: encore un shellcode (nothing in readme so far)
 level06: perfect
-level07-level09/ todo
+level07: todo (skipped)
+level08: todo
+level09: todo
+
 make thing look like subject asks + script to combine writeups into a root readme
