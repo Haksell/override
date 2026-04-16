@@ -5,13 +5,13 @@
 #include <string.h>
 #include <unistd.h>
 
-void log_wrapper(FILE* a1, const char* a2, const char* a3) {
+void log_wrapper(FILE* log_file, const char* s1, const char* s2) {
     char dest[256];
 
-    strcpy(dest, a2);
-    snprintf(&dest[strlen(dest)], 254 - strlen(dest), a3);
+    strcpy(dest, s1);
+    snprintf(&dest[strlen(dest)], 254 - strlen(dest), s2);
     dest[strcspn(dest, "\n")] = '\0';
-    fprintf(a1, "LOG: %s\n", dest);
+    fprintf(log_file, "LOG: %s\n", dest);
 }
 
 int main(int argc, const char** argv) {
