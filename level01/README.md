@@ -35,22 +35,9 @@ nope, incorrect password...
 
 Even if we passed the check, the program immediately terminates so that wouldn't help us achieve privilege escalation anyway.
 
-The real vulnerability comes from the global variable `a_user_name`. Instead of being on the local stack of `main`, it is global (in the bss section). Moreover it is shorter that the number of bytes read with `fgets`: 100 bytes instead of 256. This means there is an opportunity for a buffer overflow.
+The real vulnerability comes from a buffer overflow. The password buffer is 64 bytes long but `fgets` is called with n=100.
 
-There is another mistake in the program which allows us to store a lot of data in the bss and on the stack. The username and password checks only verify the validity up to the length of the expected value (e.g. `memcmp(a_user_name, "dat_wil", 7)`), meaning that the username `dat_wil12345678` is considered valid.
-
-```console
-level01@OverRide:~$ ./level01 
-********* ADMIN LOGIN PROMPT *********
-Enter Username: dat_wil12345678
-verifying username....
-
-Enter Password: 
-password
-nope, incorrect password...
-```
-
-The program segfaults at 0x55555555, which corresponds to UUUU, at offset 80 in the password buffer.
+To find the address of the overflow, we give a pattern `AAAABBBBCCCC...` to fgets from gdb, which prints the address. The program segfaults at 0x55555555, which corresponds to UUUU, at offset 80 in the password buffer.
 
 ```
 (gdb) run
@@ -66,6 +53,19 @@ nope, incorrect password...
 
 Program received signal SIGSEGV, Segmentation fault.
 0x55555555 in ?? ()
+```
+
+There is another mistake in the program which allows us to store a lot of data in the bss and on the stack. The username and password checks only verify the validity up to the length of the expected value (e.g. `memcmp(a_user_name, "dat_wil", 7)`), meaning that the username `dat_wil12345678` is considered valid.
+
+```console
+level01@OverRide:~$ ./level01 
+********* ADMIN LOGIN PROMPT *********
+Enter Username: dat_wil12345678
+verifying username....
+
+Enter Password: 
+password
+nope, incorrect password...
 ```
 
 The last thing we need is the address of `a_user_name`, where we will store our shellcode:
