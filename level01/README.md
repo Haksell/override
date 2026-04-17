@@ -4,6 +4,42 @@ At first glance this looks like a basic login prompt with username/password chec
 - username must match `dat_wil`
 - password must match `admin`
 
+However, whatever password we give, the program displays `nope, incorrect password...`:
+
+```console
+level01@OverRide:~$ ./level01 
+********* ADMIN LOGIN PROMPT *********
+Enter Username: test
+verifying username....
+
+nope, incorrect username...
+
+level01@OverRide:~$ ./level01 
+********* ADMIN LOGIN PROMPT *********
+Enter Username: dat_wil
+verifying username....
+
+Enter Password: 
+password
+nope, incorrect password...
+
+level01@OverRide:~$ ./level01 
+********* ADMIN LOGIN PROMPT *********
+Enter Username: dat_wil
+verifying username....
+
+Enter Password: 
+admin
+nope, incorrect password...
+
+```
+
+Even if we passed the check, the program immediately terminates so that wouldn't help us achieve privilege escalation anyway.
+
+
+
+
+
 
 ```console
 $ objdump -R level01
