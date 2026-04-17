@@ -10,45 +10,40 @@ void secret_backdoor() {
     system(s);
 }
 
-void set_msg(char* a1) {
+void set_username(char* buf) {
+    char username[140];
+
+    memset(username, 0, 128);
+    puts(">: Enter your username");
+    printf(">>: ");
+    fgets(username, 128, stdin);
+    for (int i = 0; i <= 40 && username[i]; ++i)
+        *(char*)(buf + i + 140) = username[i];
+    printf(">: Welcome, %s", (const char*)(buf + 140));
+}
+
+void set_msg(char* buf) {
     char s[1024];
 
     memset(s, 0, sizeof(s));
     puts(">: Msg @Unix-Dude");
     printf(">>: ");
     fgets(s, 1024, stdin);
-    strncpy(a1, s, *(int*)(a1 + 180));
+    strncpy(buf, s, *(int*)(buf + 180));
 }
 
-int set_username(char* a1) {
-    char s[140];
+void handle_msg() {
+    // 140 bytes buffer
+    // 40 empty bytes (where username should be written)
+    // followed by the int 140, which controls how many characters of the
+    // message are copied to buf
+    char buf[140];
+    uint64_t v2 = 0, v3 = 0, v4 = 0, v5 = 0, v6 = 0;
+    int v7 = 140;
 
-    memset(s, 0, 128);
-    puts(">: Enter your username");
-    printf(">>: ");
-    fgets(s, 128, stdin);
-    for (int i = 0; i <= 40 && s[i]; ++i) *(char*)(a1 + i + 140) = s[i];
-    return printf(">: Welcome, %s", (const char*)(a1 + 140));
-}
-
-int handle_msg() {
-    char v1[140];  // [rsp+0h] [rbp-C0h] BYREF
-    uint64_t v2;  // [rsp+8Ch] [rbp-34h]
-    uint64_t v3;  // [rsp+94h] [rbp-2Ch]
-    uint64_t v4;  // [rsp+9Ch] [rbp-24h]
-    uint64_t v5;  // [rsp+A4h] [rbp-1Ch]
-    uint64_t v6;  // [rsp+ACh] [rbp-14h]
-    int v7;  // [rsp+B4h] [rbp-Ch]
-
-    v2 = 0;
-    v3 = 0;
-    v4 = 0;
-    v5 = 0;
-    v6 = 0;
-    v7 = 140;
-    set_username(v1);
-    set_msg(v1);
-    return puts(">: Msg sent!");
+    set_username(buf);
+    set_msg(buf);
+    puts(">: Msg sent!");
 }
 
 int main() {
