@@ -1,6 +1,6 @@
 level00: perfect
 level01: perfect
-level02: clean readme
+level02: perfect
 level03: clean readme
 level04: unfinished (shellcode without execve)
 level05: encore un shellcode (nothing in readme so far)

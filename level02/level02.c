@@ -3,49 +3,45 @@
 #include <string.h>
 
 int main() {
-    char password[100];  // [rsp+10h] [rbp-110h] BYREF
-    char ptr[48];  // [rsp+80h] [rbp-A0h] BYREF
-    char username[100];  // [rsp+B0h] [rbp-70h] BYREF
-
+    char username[100];
     memset(username, 0, sizeof(username));
-    memset(ptr, 0, 41);
-    memset(password, 0, sizeof(password));
+    char password[48];
+    memset(password, 0, 41);
+    char pass_guess[100];
+    memset(pass_guess, 0, sizeof(pass_guess));
 
-    FILE* stream = fopen("/home/users/level03/.pass", "r");
-    if (!stream) {
+    FILE* pass_file = fopen("/home/users/level03/.pass", "r");
+    if (!pass_file) {
         fwrite("ERROR: failed to open password file\n", 1, 36, stderr);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
-    int bytes_read = fread(ptr, 1, 41, stream);
-    ptr[strcspn(ptr, "\n")] = '\0';
-    if (bytes_read != 41) {
+    int read_size = fread(password, 1, 41, pass_file);
+    password[strcspn(password, "\n")] = 0;
+    if (read_size != 41) {
         fwrite("ERROR: failed to read password file\n", 1, 36, stderr);
         fwrite("ERROR: failed to read password file\n", 1, 36, stderr);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
-    fclose(stream);
+    fclose(pass_file);
 
     puts("===== [ Secure Access System v1.0 ] =====");
     puts("/***************************************\\");
     puts("| You must login to access this system. |");
     puts("\\**************************************/");
-
     printf("--[ Username: ");
     fgets(username, 100, stdin);
-    username[strcspn(username, "\n")] = '\0';
-
+    username[strcspn(username, "\n")] = 0;
     printf("--[ Password: ");
-    fgets(password, 100, stdin);
-    password[strcspn(password, "\n")] = '\0';
-
+    fgets(pass_guess, 100, stdin);
+    pass_guess[strcspn(pass_guess, "\n")] = 0;
     puts("*****************************************");
-    if (strncmp(ptr, password, 41)) {
+    if (strncmp(password, pass_guess, 41)) {
         printf(username);
         puts(" does not have access!");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     printf("Greetings, %s!\n", username);
     system("/bin/sh");
-    return 0;
+    return EXIT_SUCCESS;
 }
