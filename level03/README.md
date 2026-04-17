@@ -1,57 +1,60 @@
 ## level03
 
-```nasm
-(gdb) Dump of assembler code for function main:
-   0x0804885a <+0>:     push   ebp
-   0x0804885b <+1>:     mov    ebp,esp
-=> 0x0804885d <+3>:     and    esp,0xfffffff0
-   0x08048860 <+6>:     sub    esp,0x20
-   0x08048863 <+9>:     push   eax
-   0x08048864 <+10>:    xor    eax,eax
-   0x08048866 <+12>:    je     0x804886b <main+17>
-   0x08048868 <+14>:    add    esp,0x4
-   0x0804886b <+17>:    pop    eax
-   0x0804886c <+18>:    mov    DWORD PTR [esp],0x0
-   0x08048873 <+25>:    call   0x80484b0 <time@plt>
-   0x08048878 <+30>:    mov    DWORD PTR [esp],eax
-   0x0804887b <+33>:    call   0x8048500 <srand@plt>
-   0x08048880 <+38>:    mov    DWORD PTR [esp],0x8048a48
-   0x08048887 <+45>:    call   0x80484d0 <puts@plt>
-   0x0804888c <+50>:    mov    DWORD PTR [esp],0x8048a6c
-   0x08048893 <+57>:    call   0x80484d0 <puts@plt>
-   0x08048898 <+62>:    mov    DWORD PTR [esp],0x8048a48
-   0x0804889f <+69>:    call   0x80484d0 <puts@plt>
-   0x080488a4 <+74>:    mov    eax,0x8048a7b
-   0x080488a9 <+79>:    mov    DWORD PTR [esp],eax
-   0x080488ac <+82>:    call   0x8048480 <printf@plt>
-   0x080488b1 <+87>:    mov    eax,0x8048a85
-   0x080488b6 <+92>:    lea    edx,[esp+0x1c]
-   0x080488ba <+96>:    mov    DWORD PTR [esp+0x4],edx
-   0x080488be <+100>:   mov    DWORD PTR [esp],eax
-   0x080488c1 <+103>:   call   0x8048530 <__isoc99_scanf@plt>
-   0x080488c6 <+108>:   mov    eax,DWORD PTR [esp+0x1c]
-   0x080488ca <+112>:   mov    DWORD PTR [esp+0x4],0x1337d00d
-   0x080488d2 <+120>:   mov    DWORD PTR [esp],eax
-   0x080488d5 <+123>:   call   0x8048747 <test>
-   0x080488da <+128>:   mov    eax,0x0
-   0x080488df <+133>:   leave  
-   0x080488e0 <+134>:   ret    
-End of assembler dump.
+The program asks the user for a decimal password, executes some operations on it, and checks if the output is equal to `Congratulations!`.
+
+First, a subtraction is done on our input. There might be tricks to make `rand()` somewhat deterministic by manipulating the system time, but we'll try using `key` in the correct range first.
+
+```c
+test(input, 322424845);
+
+void test(int input, int given) {
+    int key = given - input;
+
+    // actually a long unoptimized switch case in assembly
+    if (1 <= key && key <= 9 || 16 <= key && key <= 21) {
+        decrypt(key);
+    } else {
+        decrypt(rand());
+    }
+}
 ```
 
-Only 15 values to bruteforce, 322424827 is the only one thqt doesn't show "Invalid password", very strange uwu 
+Then, the program xors 17 bytes with the key, and checks if the result is equal to `Congratulations!`
+
+```c
+void decrypt(int key) {
+    char buf[17];  // = "Q}|u`sfg~sf{}|a3"
+    // Encoded data written as raw bytes from the assembly
+    *(int*)(buf + 0x0) = 0x757c7d51;  // Q}|u
+    *(int*)(buf + 0x4) = 0x67667360;  // `sfg
+    *(int*)(buf + 0x8) = 0x7b66737e;  // ~sf{
+    *(int*)(buf + 0xc) = 0x33617c7d;  // }|a3
+    buf[16] = '\0';
+
+    size_t len = strlen(buf);
+    for (size_t i = 0; i < 16; i++) buf[i] ^= key;
+
+    if (!strcmp(buf, "Congratulations!")) {
+        system("/bin/sh");
+    } else {
+        puts("\nInvalid Password");
+    }
+}
+```
+
+XOR is a self-inverse function, so by checking the XOR between the random bytes and the expected result, we can find the correct key.
+
+```python
+>>> ord('C') ^ ord('Q')
+18
+>>> ord('o') ^ ord('}')
+18
+>>> ...
+```
+
+Luckily, 18 is in the valid range from the `test` function, so we can simply give `322424845 - 18 = 322424827` as the password.
 
 ```
-level03@OverRide:~$ echo '322424822' |  ./level03 
-***********************************
-*               level03         **
-***********************************
-Password:
-Invalid Password
-level03@OverRide:~$ echo '322424827' |  ./level03 
-***********************************
-*               level03         **
-***********************************
 Password:level03@OverRide:~$ ./level03 
 ***********************************
 *               level03         **
@@ -62,12 +65,3 @@ level04
 $ cat /home/users/level04/.pass
 kgv3tkEb9h2mLkRsPkXRfc2mHbjMxQzvb2FrgKkf
 ```
-
-```python
->>> ord('C') ^ ord('Q')
-18
->>> ord('o') ^ ord('}')
-18
-```
-
-The key must be 18 so we give 322424845 - 18 = 322424827 im a hacker of cyberspace

@@ -24,11 +24,11 @@ void decrypt(int key) {
 }
 
 void test(int input, int given) {
-    int diff = given - input;
+    int key = given - input;
 
     // actually a long unoptimized switch case in assembly
-    if (1 <= diff && diff <= 9 || 16 <= diff && diff <= 21) {
-        decrypt(diff);
+    if (1 <= key && key <= 9 || 16 <= key && key <= 21) {
+        decrypt(key);
     } else {
         decrypt(rand());
     }
