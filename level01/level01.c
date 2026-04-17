@@ -15,8 +15,8 @@ bool verify_user_pass(const void* password) {
 }
 
 int main() {
-    char buf[64];
-    memset(buf, 0, sizeof(buf));
+    char password[64];
+    memset(password, 0, sizeof(password));
     bool check = false;
 
     puts("********* ADMIN LOGIN PROMPT *********");
@@ -30,8 +30,8 @@ int main() {
     }
 
     puts("Enter Password: ");
-    fgets(buf, 100, stdin);
-    check = verify_user_pass(buf);
+    fgets(password, 100, stdin);
+    check = verify_user_pass(password);
     if (check || !check) {  // hard to avoid tbh
         puts("nope, incorrect password...\n");
         return EXIT_FAILURE;

