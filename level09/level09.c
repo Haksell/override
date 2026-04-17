@@ -17,6 +17,8 @@ void set_username(char* buf) {
     puts(">: Enter your username");
     printf(">>: ");
     fgets(username, 128, stdin);
+    // BUG FOUND!!!
+    // It should be < 40 and will allow us to overwrite the strncpy argument
     for (int i = 0; i <= 40 && username[i]; ++i) buf[i + 140] = username[i];
     printf(">: Welcome, %s", buf + 140);
 }
@@ -32,10 +34,6 @@ void set_msg(char* buf) {
 }
 
 void handle_msg() {
-    // 140 bytes buffer
-    // 40 empty bytes (where username should be written)
-    // followed by the int 140, which controls how many characters of the
-    // message are copied to buf
     char buf[140];
     uint64_t v2 = 0, v3 = 0, v4 = 0, v5 = 0, v6 = 0;
     int v7 = 140;
