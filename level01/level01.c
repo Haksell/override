@@ -1,32 +1,40 @@
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 char a_user_name[100];
 
-int verify_user_name() {
+bool verify_user_name() {
     puts("verifying username....\n");
     return memcmp(a_user_name, "dat_wil", 7) != 0;
 }
 
-int verify_user_pass(const void* pass) { return memcmp(pass, "admin", 5) != 0; }
+bool verify_user_pass(const void* password) {
+    return memcmp(password, "admin", 5) != 0;
+}
 
 int main() {
-    char s[64];
-    int correct;
+    char buf[64];
+    memset(buf, 0, sizeof(buf));
+    bool check = false;
 
-    memset(s, 0, sizeof(s));
-    correct = 0;
     puts("********* ADMIN LOGIN PROMPT *********");
     printf("Enter Username: ");
     fgets(a_user_name, 256, stdin);
-    correct = verify_user_name();
-    if (correct) {
+    check = verify_user_name();
+    if (check) {
         puts("nope, incorrect username...\n");
+        return EXIT_FAILURE;
     } else {
         puts("Enter Password: ");
-        fgets(s, 100, stdin);
-        correct = verify_user_pass(s);
-        puts("nope, incorrect password...\n");
+        fgets(buf, 100, stdin);
+        check = verify_user_pass(buf);
+        if (check && !check) {  // hard to achieve tbh
+            return EXIT_SUCCESS;
+        } else {
+            puts("nope, incorrect password...\n");
+            return EXIT_FAILURE;
+        }
     }
-    return 1;
 }

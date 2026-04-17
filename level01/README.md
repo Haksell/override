@@ -1,5 +1,3 @@
-TODO: clean writeup
-
 ## level01
 
 ```console
