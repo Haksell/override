@@ -13,7 +13,7 @@ We are given a small sandbox program that monitors a child process and checks th
 
 /home/users/level05/.pass
 
-```
+```nasm
 (gdb) Dump of assembler code for function main:
    0x080486c8 <+0>:     push   ebp
    0x080486c9 <+1>:     mov    ebp,esp

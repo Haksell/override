@@ -1,6 +1,6 @@
 ## level03
 
-```
+```nasm
 (gdb) Dump of assembler code for function main:
    0x0804885a <+0>:     push   ebp
    0x0804885b <+1>:     mov    ebp,esp

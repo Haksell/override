@@ -30,13 +30,13 @@ void set_msg(char* buf) {
     puts(">: Msg @Unix-Dude");
     printf(">>: ");
     fgets(s, 1024, stdin);
-    strncpy(buf, s, *(int*)(buf + 180));
+    strncpy(buf, s, *(uint32_t*)(buf + 180));
 }
 
 void handle_msg() {
-    char buf[140];
-    uint64_t v2 = 0, v3 = 0, v4 = 0, v5 = 0, v6 = 0;
-    int v7 = 140;
+    char buf[192];
+    memset(buf + 140, 0, 40);  // username
+    *(uint32_t*)(buf + 180) = 140;  // message length
 
     set_username(buf);
     set_msg(buf);

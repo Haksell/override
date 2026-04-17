@@ -10,7 +10,7 @@ $ objdump -t level01 | grep user
 0804a040 g     O .bss   00000064              a_user_name
 ```
 
-```console
+```
 (gdb) b main
 [...]
 (gdb) run
@@ -24,7 +24,7 @@ Stack level 0, frame at 0xffffc900:
   ebp at 0xffffc8f8, eip at 0xffffc8fc
 ```
 
-```console
+```
 (gdb) r
 Starting program: /home/norxondor/42/override/level01/level01 
 [Thread debugging using libthread_db enabled]
