@@ -22,6 +22,7 @@ int main() {
     puts("********* ADMIN LOGIN PROMPT *********");
     printf("Enter Username: ");
     fgets(a_user_name, 256, stdin);
+
     check = verify_user_name();
     if (check) {
         puts("nope, incorrect username...\n");
@@ -30,11 +31,11 @@ int main() {
         puts("Enter Password: ");
         fgets(buf, 100, stdin);
         check = verify_user_pass(buf);
-        if (check && !check) {  // hard to achieve tbh
-            return EXIT_SUCCESS;
-        } else {
+        if (check || !check) {  // hard to avoid tbh
             puts("nope, incorrect password...\n");
             return EXIT_FAILURE;
         }
     }
+
+    return EXIT_SUCCESS;
 }

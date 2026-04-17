@@ -1,5 +1,10 @@
 ## level01
 
+At first glance this looks like a basic login prompt with username/password checks. The logic seems simple:
+- username must match `dat_wil`
+- password must match `admin`
+
+
 ```console
 $ objdump -R level01
 0804a008 R_386_JUMP_SLOT   puts@GLIBC_2.0
