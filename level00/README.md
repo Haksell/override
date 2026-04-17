@@ -28,13 +28,15 @@ The only difference with rainfall (the previous project), is the presence of `Pa
 There is an executable file with the setuid bit on. It means that if we manage to execute a shell or any other command from within it, it will be executed with the permissions of `level01`, allowing us to escalate privileges.
 
 ```console
-level00@OverRide:~$ ls -Ahl
-total 13K
+level00@OverRide:~$ ll
+total 13
+dr-xr-x---+ 1 level01 level01   60 Sep 13  2016 ./
+dr-x--x--x  1 root    root     260 Oct  2  2016 ../
 -rw-r--r--  1 level01 level01  220 Sep 10  2016 .bash_logout
 lrwxrwxrwx  1 root    root       7 Sep 13  2016 .bash_profile -> .bashrc
--rw-r--r--  1 level00 level00 3.5K Sep 10  2016 .bashrc
+-rw-r--r--  1 level00 level00 3533 Sep 10  2016 .bashrc
 -rw-r--r--  1 level01 level01  675 Sep 10  2016 .profile
--rwsr-s---+ 1 level01 users   7.2K Sep 10  2016 level00
+-rwsr-s---+ 1 level01 users   7280 Sep 10  2016 level00*
 ```
 
 The executable itself, decompiled with Hex-Rays, simply checks if we enter the correct password.

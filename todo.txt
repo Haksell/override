@@ -1,4 +1,4 @@
-level00: clean readme
+level00: perfect
 level01: clean readme
 level02: clean readme
 level03: clean readme
