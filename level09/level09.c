@@ -17,9 +17,8 @@ void set_username(char* buf) {
     puts(">: Enter your username");
     printf(">>: ");
     fgets(username, 128, stdin);
-    for (int i = 0; i <= 40 && username[i]; ++i)
-        *(char*)(buf + i + 140) = username[i];
-    printf(">: Welcome, %s", (const char*)(buf + 140));
+    for (int i = 0; i <= 40 && username[i]; ++i) buf[i + 140] = username[i];
+    printf(">: Welcome, %s", buf + 140);
 }
 
 void set_msg(char* buf) {
